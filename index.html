@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMS — Mouse Locomotor Scoring</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: #e6e3dd;
+    --text: #2c2c2c;
+    --text-muted: #8c8a84;
+    --accent: #1a1a1a;
+    --sham: #5b8c5a;
+    --vehicle: #c44e52;
+    --treat-a: #4c72b0;
+    --treat-b: #8e6eb8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ---------- subtle noise texture ---------- */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+  /* ---------- header ---------- */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 28px;
+  }
+  .header-left h1 {
+    font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent);
+  }
+  .header-left .subtitle {
+    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted);
+    letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;
+  }
+  .header-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 9px 18px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
+    cursor: pointer; transition: all 0.18s ease; letter-spacing: 0.2px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #333; }
+  .btn-outline { background: transparent; color: var(--accent); border-color: var(--border); }
+  .btn-outline:hover { background: #f3f2ef; border-color: #ccc; }
+  .btn-sm { font-size: 11px; padding: 5px 12px; }
+
+  /* ---------- config bar ---------- */
+  .config-bar {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: end;
+    background: var(--surface); padding: 18px 22px; border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 24px;
+  }
+  .config-group { display: flex; flex-direction: column; gap: 4px; }
+  .config-group label {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .config-group input {
+    font-family: 'DM Mono', monospace; font-size: 14px; width: 72px;
+    padding: 7px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg); outline: none; transition: border 0.15s;
+  }
+  .config-group input:focus { border-color: var(--accent); }
+
+  /* ---------- grid section ---------- */
+  .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 28px; }
+
+  .group-card {
+    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+    overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .group-card:hover { box-shadow: var(--shadow-lg); }
+
+  .group-card-header {
+    padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-name {
+    font-weight: 700; font-size: 14px; letter-spacing: -0.3px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .group-dot {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+  }
+  .group-n { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+
+  .group-card-body { padding: 10px 14px 14px; max-height: 260px; overflow: auto; }
+
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .mini-table th {
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+    color: var(--text-muted); padding: 5px 4px; text-align: center;
+    position: sticky; top: 0; background: var(--surface); z-index: 1;
+    border-bottom: 2px solid var(--border);
+  }
+  .mini-table td { padding: 2px 3px; text-align: center; }
+  .mini-table input {
+    font-family: 'DM Mono', monospace; font-size: 12px; width: 38px;
+    text-align: center; border: 1px solid transparent; border-radius: 3px;
+    padding: 3px 1px; background: transparent; outline: none; transition: all 0.12s;
+  }
+  .mini-table input:hover { border-color: #ddd; }
+  .mini-table input:focus { border-color: var(--accent); background: #fafaf8; }
+  .mouse-label {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted);
+  }
+
+  .group-avg {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    padding: 8px 18px; border-top: 1px solid var(--border);
+    color: var(--text-muted); display: flex; justify-content: space-between;
+  }
+  .group-avg strong { color: var(--text); }
+
+  /* ---------- chart area ---------- */
+  .chart-section {
+    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 22px 24px; margin-bottom: 28px;
+  }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .chart-header h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .chart-wrap { position: relative; height: 380px; }
+  canvas { width: 100%; height: 100%; }
+
+  .legend-inline { display: flex; gap: 18px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+  .legend-line { width: 22px; height: 2.5px; border-radius: 2px; }
+
+  /* ---------- footer ---------- */
+  .footer {
+    display: flex; justify-content: center; padding: 8px;
+    font-size: 11px; color: var(--text-muted);
+    font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
+  }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff; padding: 10px 24px;
+    border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 999;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 768px) {
+    .app { padding: 16px; }
+    .header { flex-direction: column; gap: 14px; align-items: flex-start; }
+    .group-grid { grid-template-columns: 1fr; }
+    .config-bar { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ====== HEADER ====== -->
+  <div class="header">
+    <div class="header-left">
+      <h1>BMS Scoring</h1>
+      <div class="subtitle">Basso Mouse Scale &middot; Spinal Cord Injury &middot; Daily Record</div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" onclick="configDays()">⚙ 设置天数</button>
+      <button class="btn btn-primary" onclick="generateRandom()">🎲 生成随机数据</button>
+      <button class="btn btn-outline" onclick="exportCSV()">⬇ 导出 CSV</button>
+    </div>
+  </div>
+
+  <!-- ====== CONFIG BAR ====== -->
+  <div class="config-bar">
+    <div class="config-group">
+      <label>每笼小鼠数</label>
+      <input type="number" id="micePerGroup" value="6" min="2" max="12" onchange="rebuild()">
+    </div>
+    <div class="config-group">
+      <label>观察天数</label>
+      <input type="number" id="totalDays" value="14" min="1" max="42" onchange="rebuild()">
+    </div>
+    <div style="flex:1;min-width:200px">
+      <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px">分组名称（可编辑）</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+        <input id="gname0" value="Sham" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:140px" onchange="rebuild()">
+        <input id="gname1" value="SCI + Vehicle" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:140px" onchange="rebuild()">
+        <input id="gname2" value="SCI + Treat A" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:140px" onchange="rebuild()">
+        <input id="gname3" value="SCI + Treat B" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:140px" onchange="rebuild()">
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 4 GROUP CARDS ====== -->
+  <div class="group-grid" id="groupGrid"></div>
+
+  <!-- ====== CHART ====== -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <h2>BMS Score Trajectory</h2>
+      <div class="legend-inline" id="chartLegend"></div>
+    </div>
+    <div class="chart-wrap"><canvas id="bmsChart"></canvas></div>
+  </div>
+
+  <div class="footer">BMS · 0 = complete paralysis &nbsp;|&nbsp; 9 = normal locomotion</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ STATE ============
+const GROUP_COLORS = ['#5b8c5a', '#c44e52', '#4c72b0', '#8e6eb8'];
+let groupNames = ['Sham', 'SCI + Vehicle', 'SCI + Treat A', 'SCI + Treat B'];
+let micePerGroup = 6;
+let totalDays = 14;
+let data = []; // data[g][mouse][day] = score (0-9)
+let chart = null;
+
+// ============ HELPERS ============
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function sem(arr) {
+  if (arr.length <= 1) return 0;
+  const m = mean(arr);
+  const variance = arr.reduce((s,x)=>s+(x-m)**2,0)/(arr.length-1);
+  return Math.sqrt(variance / arr.length);
+}
+
+// ============ DATA INIT ============
+function initData() {
+  data = [];
+  for (let g = 0; g < 4; g++) {
+    data[g] = [];
+    for (let m = 0; m < micePerGroup; m++) {
+      data[g][m] = new Array(totalDays).fill(null);
+    }
+  }
+}
+
+// ============ RANDOM DATA GENERATION ============
+function generateRandom() {
+  initData();
+  for (let g = 0; g < 4; g++) {
+    const name = groupNames[g].toLowerCase();
+    const isSham = name.includes('sham');
+
+    for (let m = 0; m < micePerGroup; m++) {
+      for (let d = 0; d < totalDays; d++) {
+        if (isSham) {
+          // Sham: 8-9, slight drop then back
+          const base = (d < 2) ? 7.5 + Math.random() * 0.8 : 8.2 + Math.random() * 0.8;
+          data[g][m][d] = clamp(Math.round(base), 0, 9);
+        } else {
+          // SCI groups: sigmoid recovery with group-specific plateaus
+          let plateau;
+          let steepness;
+          if (name.includes('treat b'))      { plateau = 6.5; steepness = 0.35; }
+          else if (name.includes('treat a')) { plateau = 5.2; steepness = 0.30; }
+          else                               { plateau = 3.5; steepness = 0.25; }
+
+          const raw = plateau / (1 + Math.exp(-steepness * (d - 5)));
+          const noise = (Math.random() - 0.5) * 1.2;
+          const fluctuation = Math.sin(d * 0.6) * 0.3; // slight waviness
+          data[g][m][d] = clamp(Math.round(raw + noise + fluctuation), 0, 9);
+        }
+      }
+      // Day 1 for SCI: clamp to 0-2
+      if (!isSham) {
+        data[g][m][0] = clamp(Math.round(Math.random() * 1.5), 0, 2);
+        data[g][m][1] = clamp(Math.round(0.5 + Math.random() * 1.5), 0, 3);
+      }
+    }
+  }
+  renderAll();
+  updateChart();
+  toast('已生成随机 BMS 数据');
+}
+
+// ============ RENDER ============
+function renderAll() {
+  const grid = document.getElementById('groupGrid');
+  grid.innerHTML = '';
+
+  for (let g = 0; g < 4; g++) {
+    const card = document.createElement('div');
+    card.className = 'group-card';
+
+    // header
+    const avgAll = data[g].flat().filter(x => x !== null);
+    const avgVal = avgAll.length ? mean(avgAll).toFixed(1) : '-';
+
+    card.innerHTML = `
+      <div class="group-card-header">
+        <span class="group-name">
+          <span class="group-dot" style="background:${GROUP_COLORS[g]}"></span>
+          ${groupNames[g]}
+        </span>
+        <span class="group-n">n = ${micePerGroup}</span>
+      </div>
+      <div class="group-card-body">
+        <table class="mini-table">
+          <thead><tr>
+            <th>#</th>
+            ${Array.from({length:totalDays},(_,i)=>`<th>D${i+1}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${Array.from({length:micePerGroup},(_,m)=>`
+              <tr>
+                <td class="mouse-label">M${m+1}</td>
+                ${Array.from({length:totalDays},(_,d)=>`
+                  <td><input type="number" min="0" max="9" step="1"
+                    value="${data[g][m][d] !== null ? data[g][m][d] : ''}"
+                    data-g="${g}" data-m="${m}" data-d="${d}"
+                    onchange="onCellChange(this)"
+                    onfocus="this.select()">
+                  </td>`).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="group-avg">
+        <span>全组均值</span>
+        <strong>${avgVal}</strong>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function onCellChange(input) {
+  const g = parseInt(input.dataset.g);
+  const m = parseInt(input.dataset.m);
+  const d = parseInt(input.dataset.d);
+  const val = input.value.trim();
+  if (val === '' || val === '-') {
+    data[g][m][d] = null;
+  } else {
+    const num = parseInt(val, 10);
+    if (!isNaN(num)) data[g][m][d] = clamp(num, 0, 9);
+  }
+  // refresh group average
+  const card = input.closest('.group-card');
+  const avgAll = data[g].flat().filter(x => x !== null);
+  const avgVal = avgAll.length ? mean(avgAll).toFixed(1) : '-';
+  card.querySelector('.group-avg strong').textContent = avgVal;
+  updateChart();
+}
+
+// ============ CHART ============
+function updateChart() {
+  const ctx = document.getElementById('bmsChart').getContext('2d');
+  const days = Array.from({length: totalDays}, (_, i) => `D${i+1}`);
+
+  const datasets = groupNames.map((name, g) => {
+    const means = [];
+    const sems = [];
+    for (let d = 0; d < totalDays; d++) {
+      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+      means.push(vals.length ? mean(vals) : null);
+      sems.push(vals.length ? sem(vals) : null);
+    }
+    return {
+      label: name,
+      data: means,
+      errorBars: sems,
+      borderColor: GROUP_COLORS[g],
+      backgroundColor: GROUP_COLORS[g] + '18',
+      borderWidth: 2.5,
+      pointRadius: 3.5,
+      pointHoverRadius: 6,
+      pointBackgroundColor: GROUP_COLORS[g],
+      tension: 0.35,
+      fill: true,
+      spanGaps: false,
+    };
+  });
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: days, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff',
+          titleColor: '#2c2c2c',
+          bodyColor: '#2c2c2c',
+          borderColor: '#e6e3dd',
+          borderWidth: 1,
+          cornerRadius: 8,
+          titleFont: { family: 'Space Grotesk', weight: '700', size: 13 },
+          bodyFont: { family: 'DM Mono', size: 12 },
+          callbacks: {
+            label: function(ctx) {
+              const d = ctx.dataIndex;
+              const semVal = ctx.dataset.errorBars[d];
+              return `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} ± ${semVal.toFixed(2)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Days Post-Injury', font: { family: 'Space Grotesk', size: 12, weight: '600' } },
+          grid: { color: '#f0ede8' },
+          ticks: { font: { family: 'DM Mono', size: 10 } }
+        },
+        y: {
+          title: { display: true, text: 'BMS Score', font: { family: 'Space Grotesk', size: 12, weight: '600' } },
+          min: 0, max: 9,
+          ticks: { stepSize: 1, font: { family: 'DM Mono', size: 10 } },
+          grid: { color: '#f0ede8' }
+        }
+      }
+    },
+    plugins: [{
+      id: 'semErrorBars',
+      afterDraw(chart) {
+        const { ctx, scales: { x: xScale, y: yScale } } = chart;
+        chart.data.datasets.forEach((ds, i) => {
+          const meta = chart.getDatasetMeta(i);
+          ds.data.forEach((val, j) => {
+            if (val === null || ds.errorBars[j] === null) return;
+            const pt = meta.data[j];
+            const sem = ds.errorBars[j];
+            const yTop = yScale.getPixelForValue(val + sem);
+            const yBot = yScale.getPixelForValue(val - sem);
+            const x = pt.x;
+            ctx.save();
+            ctx.strokeStyle = ds.borderColor;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, yTop);
+            ctx.lineTo(x, yBot);
+            ctx.stroke();
+            // caps
+            ctx.beginPath();
+            ctx.moveTo(x - 3, yTop);
+            ctx.lineTo(x + 3, yTop);
+            ctx.moveTo(x - 3, yBot);
+            ctx.lineTo(x + 3, yBot);
+            ctx.stroke();
+            ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+
+  // chart legend inline
+  document.getElementById('chartLegend').innerHTML = groupNames.map((n, g) =>
+    `<span class="legend-item"><span class="legend-line" style="background:${GROUP_COLORS[g]}"></span>${n}</span>`
+  ).join('');
+}
+
+// ============ EXPORT CSV ============
+function exportCSV() {
+  let csv = '﻿'; // BOM for Excel Chinese support
+  for (let g = 0; g < 4; g++) {
+    csv += `${groupNames[g]}\n`;
+    csv += 'Mouse,' + Array.from({length: totalDays}, (_, i) => `Day${i+1}`).join(',') + '\n';
+    for (let m = 0; m < micePerGroup; m++) {
+      csv += `M${m+1},` + data[g][m].map(v => v !== null ? v : '').join(',') + '\n';
+    }
+    // group averages
+    const avgs = [];
+    for (let d = 0; d < totalDays; d++) {
+      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+      avgs.push(vals.length ? mean(vals).toFixed(2) : '');
+    }
+    csv += 'Mean,' + avgs.join(',') + '\n';
+    const sems = [];
+    for (let d = 0; d < totalDays; d++) {
+      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+      sems.push(vals.length ? sem(vals).toFixed(3) : '');
+    }
+    csv += 'SEM,' + sems.join(',') + '\n\n';
+  }
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `BMS_Scores_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV 已导出');
+}
+
+// ============ CONFIG ============
+function configDays() {
+  const d = prompt('设置观察天数（1-42）：', totalDays);
+  if (d !== null) {
+    const nd = clamp(parseInt(d, 10) || 14, 1, 42);
+    document.getElementById('totalDays').value = nd;
+    rebuild();
+  }
+}
+
+function rebuild() {
+  micePerGroup = clamp(parseInt(document.getElementById('micePerGroup').value) || 6, 2, 12);
+  totalDays = clamp(parseInt(document.getElementById('totalDays').value) || 14, 1, 42);
+  for (let g = 0; g < 4; g++) {
+    groupNames[g] = document.getElementById('gname' + g).value.trim() || `Group ${g+1}`;
+  }
+  initData();
+  renderAll();
+  updateChart();
+}
+
+// ============ INIT ============
+initData();
+renderAll();
+updateChart();
+</script>
+</body>
+</html>
