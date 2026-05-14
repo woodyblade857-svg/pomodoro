@@ -35,7 +35,6 @@
     min-height: 100vh;
   }
 
-  /* ---------- subtle noise texture ---------- */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -45,21 +44,17 @@
 
   .app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
 
-  /* ---------- header ---------- */
   .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 28px;
   }
-  .header-left h1 {
-    font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent);
-  }
+  .header-left h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); }
   .header-left .subtitle {
     font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted);
     letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;
   }
   .header-right { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  /* ---------- buttons ---------- */
   .btn {
     font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
     padding: 9px 18px; border-radius: var(--radius-sm); border: 1.5px solid transparent;
@@ -70,13 +65,12 @@
   .btn-primary:hover { background: #333; }
   .btn-outline { background: transparent; color: var(--accent); border-color: var(--border); }
   .btn-outline:hover { background: #f3f2ef; border-color: #ccc; }
-  .btn-sm { font-size: 11px; padding: 5px 12px; }
 
   /* ---------- config bar ---------- */
   .config-bar {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: end;
     background: var(--surface); padding: 18px 22px; border-radius: var(--radius);
-    box-shadow: var(--shadow); margin-bottom: 24px;
+    box-shadow: var(--shadow); margin-bottom: 16px;
   }
   .config-group { display: flex; flex-direction: column; gap: 4px; }
   .config-group label {
@@ -84,14 +78,52 @@
     text-transform: uppercase; letter-spacing: 0.8px;
   }
   .config-group input {
-    font-family: 'DM Mono', monospace; font-size: 14px; width: 72px;
-    padding: 7px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Mono', monospace; font-size: 14px; padding: 7px 10px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     background: var(--bg); outline: none; transition: border 0.15s;
   }
   .config-group input:focus { border-color: var(--accent); }
 
+  .tp-input {
+    width: 260px !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---------- timepoint chips ---------- */
+  .chip-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    background: var(--surface); padding: 12px 18px; border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 24px;
+  }
+  .chip-bar-label {
+    font-size: 10px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-right: 4px;
+    white-space: nowrap;
+  }
+  .tp-chip {
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600;
+    padding: 5px 12px; border-radius: 16px; border: 1.5px solid var(--border);
+    background: var(--bg); cursor: pointer; transition: all 0.15s;
+    user-select: none; letter-spacing: 0.3px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .tp-chip:hover { border-color: #bbb; }
+  .tp-chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tp-chip.on .chip-eye { opacity: 1; }
+  .tp-chip.off { color: #ccc; text-decoration: line-through; text-decoration-color: #ddd; }
+  .chip-eye { font-size: 10px; opacity: 0.6; }
+  .chip-actions { margin-left: auto; display: flex; gap: 6px; }
+  .chip-preset {
+    font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600;
+    padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border);
+    background: #fff; cursor: pointer; color: var(--text-muted); transition: all 0.15s;
+  }
+  .chip-preset:hover { border-color: var(--accent); color: var(--accent); }
+
   /* ---------- grid section ---------- */
-  .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 28px; }
+  .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 28px; }
 
   .group-card {
     background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
@@ -103,13 +135,8 @@
     padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
-  .group-name {
-    font-weight: 700; font-size: 14px; letter-spacing: -0.3px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .group-dot {
-    width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0;
-  }
+  .group-name { font-weight: 700; font-size: 14px; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+  .group-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .group-n { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
 
   .group-card-body { padding: 10px 14px 14px; max-height: 260px; overflow: auto; }
@@ -117,21 +144,19 @@
   .mini-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .mini-table th {
     font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
-    color: var(--text-muted); padding: 5px 4px; text-align: center;
+    color: var(--text-muted); padding: 5px 3px; text-align: center;
     position: sticky; top: 0; background: var(--surface); z-index: 1;
     border-bottom: 2px solid var(--border);
   }
-  .mini-table td { padding: 2px 3px; text-align: center; }
+  .mini-table td { padding: 2px 2px; text-align: center; }
   .mini-table input {
-    font-family: 'DM Mono', monospace; font-size: 12px; width: 38px;
+    font-family: 'DM Mono', monospace; font-size: 12px; width: 36px;
     text-align: center; border: 1px solid transparent; border-radius: 3px;
     padding: 3px 1px; background: transparent; outline: none; transition: all 0.12s;
   }
   .mini-table input:hover { border-color: #ddd; }
   .mini-table input:focus { border-color: var(--accent); background: #fafaf8; }
-  .mouse-label {
-    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted);
-  }
+  .mouse-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
 
   .group-avg {
     font-family: 'DM Mono', monospace; font-size: 11px;
@@ -147,21 +172,19 @@
   }
   .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .chart-header h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
-  .chart-wrap { position: relative; height: 380px; }
+  .chart-wrap { position: relative; height: 400px; }
   canvas { width: 100%; height: 100%; }
 
   .legend-inline { display: flex; gap: 18px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
   .legend-line { width: 22px; height: 2.5px; border-radius: 2px; }
 
-  /* ---------- footer ---------- */
   .footer {
     display: flex; justify-content: center; padding: 8px;
     font-size: 11px; color: var(--text-muted);
     font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
   }
 
-  /* ---------- toast ---------- */
   .toast {
     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
     background: var(--accent); color: #fff; padding: 10px 24px;
@@ -170,26 +193,24 @@
   }
   .toast.show { opacity: 1; }
 
-  /* ---------- responsive ---------- */
   @media (max-width: 768px) {
     .app { padding: 16px; }
     .header { flex-direction: column; gap: 14px; align-items: flex-start; }
     .group-grid { grid-template-columns: 1fr; }
     .config-bar { gap: 12px; }
+    .tp-input { width: 200px !important; }
   }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- ====== HEADER ====== -->
   <div class="header">
     <div class="header-left">
       <h1>BMS Scoring</h1>
-      <div class="subtitle">Basso Mouse Scale &middot; Spinal Cord Injury &middot; Daily Record</div>
+      <div class="subtitle">Basso Mouse Scale &middot; Spinal Cord Injury</div>
     </div>
     <div class="header-right">
-      <button class="btn btn-outline" onclick="configDays()">⚙ 设置天数</button>
       <button class="btn btn-primary" onclick="generateRandom()">🎲 生成随机数据</button>
       <button class="btn btn-outline" onclick="exportCSV()">⬇ 导出 CSV</button>
     </div>
@@ -202,8 +223,11 @@
       <input type="number" id="micePerGroup" value="6" min="2" max="12" onchange="rebuild()">
     </div>
     <div class="config-group">
-      <label>观察天数</label>
-      <input type="number" id="totalDays" value="14" min="1" max="42" onchange="rebuild()">
+      <label>时间点 (逗号分隔)</label>
+      <input type="text" class="tp-input" id="timepointsInput"
+        value="1,3,7,14,21,28"
+        onchange="onTimepointsChange()"
+        placeholder="例: 1,3,7,14,21,28">
     </div>
     <div style="flex:1;min-width:200px">
       <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px">分组名称（可编辑）</label>
@@ -214,6 +238,19 @@
         <input id="gname3" value="SCI + Treat B" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:140px" onchange="rebuild()">
       </div>
     </div>
+  </div>
+
+  <!-- ====== TIMEPOINT TOGGLE CHIPS ====== -->
+  <div class="chip-bar" id="chipBar">
+    <span class="chip-bar-label">图表显示 ▸</span>
+    <span id="chipContainer" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></span>
+    <span class="chip-actions">
+      <button class="chip-preset" onclick="setPreset('sci')">SCI 标准</button>
+      <button class="chip-preset" onclick="setPreset('acute')">急性期</button>
+      <button class="chip-preset" onclick="setPreset('chronic')">慢性期</button>
+      <button class="chip-preset" onclick="setPreset('daily')">每日</button>
+      <button class="chip-preset" onclick="toggleAllChips()">全选/反选</button>
+    </span>
   </div>
 
   <!-- ====== 4 GROUP CARDS ====== -->
@@ -228,7 +265,7 @@
     <div class="chart-wrap"><canvas id="bmsChart"></canvas></div>
   </div>
 
-  <div class="footer">BMS · 0 = complete paralysis &nbsp;|&nbsp; 9 = normal locomotion</div>
+  <div class="footer">BMS · 0 = complete paralysis &nbsp;|&nbsp; 9 = normal locomotion &nbsp;|&nbsp; 点击时间点标签可隐藏/显示对应数据</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -238,20 +275,18 @@
 const GROUP_COLORS = ['#5b8c5a', '#c44e52', '#4c72b0', '#8e6eb8'];
 let groupNames = ['Sham', 'SCI + Vehicle', 'SCI + Treat A', 'SCI + Treat B'];
 let micePerGroup = 6;
-let totalDays = 14;
-let data = []; // data[g][mouse][day] = score (0-9)
+let timepoints = [1, 3, 7, 14, 21, 28];   // actual days
+let hiddenTP = new Set();                  // indices of hidden timepoints
+let data = [];   // data[g][m][tpIdx] = score (0-9)
 let chart = null;
 
-// ============ HELPERS ============
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2000);
 }
-
 function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function sem(arr) {
   if (arr.length <= 1) return 0;
@@ -260,18 +295,86 @@ function sem(arr) {
   return Math.sqrt(variance / arr.length);
 }
 
-// ============ DATA INIT ============
+// ============ TIMEPOINTS ============
+function parseTimepoints(raw) {
+  const parts = raw.split(/[,，\s]+/).filter(Boolean);
+  const tps = [];
+  for (const p of parts) {
+    const n = parseInt(p, 10);
+    if (!isNaN(n) && n >= 0 && n <= 365 && !tps.includes(n)) tps.push(n);
+  }
+  if (tps.length === 0) return [1, 3, 7, 14, 21, 28]; // fallback
+  tps.sort((a,b) => a-b);
+  return tps;
+}
+
+function onTimepointsChange() {
+  const raw = document.getElementById('timepointsInput').value.trim();
+  timepoints = parseTimepoints(raw);
+  // reset hidden set for new timepoints
+  hiddenTP.clear();
+  document.getElementById('timepointsInput').value = timepoints.join(',');
+  rebuild();
+}
+
+function setPreset(type) {
+  let tp;
+  switch(type) {
+    case 'sci':     tp = [1, 3, 7, 14, 21, 28]; break;
+    case 'acute':   tp = [1, 2, 3, 5, 7]; break;
+    case 'chronic': tp = [7, 14, 21, 28, 35, 42]; break;
+    case 'daily':   tp = Array.from({length:14},(_,i)=>i+1); break;
+  }
+  timepoints = tp;
+  hiddenTP.clear();
+  document.getElementById('timepointsInput').value = tp.join(',');
+  rebuild();
+}
+
+function toggleTP(idx) {
+  if (hiddenTP.has(idx)) hiddenTP.delete(idx); else hiddenTP.add(idx);
+  renderChips();
+  updateChart();
+}
+
+function toggleAllChips() {
+  const visible = timepoints.filter((_, i) => !hiddenTP.has(i));
+  if (visible.length === timepoints.length) {
+    // all visible → hide all except first and last
+    for (let i = 0; i < timepoints.length; i++) hiddenTP.add(i);
+    hiddenTP.delete(0);
+    if (timepoints.length > 1) hiddenTP.delete(timepoints.length - 1);
+  } else if (visible.length === 0) {
+    hiddenTP.clear();
+  } else {
+    // some hidden → show all
+    hiddenTP.clear();
+  }
+  renderChips();
+  updateChart();
+}
+
+function renderChips() {
+  const container = document.getElementById('chipContainer');
+  container.innerHTML = timepoints.map((d, i) => {
+    const on = !hiddenTP.has(i);
+    return `<span class="tp-chip ${on ? 'on' : 'off'}" onclick="toggleTP(${i})" title="点击${on?'隐藏':'显示'} D${d}">
+      <span class="chip-eye">${on ? '👁' : '—'}</span> D${d}
+    </span>`;
+  }).join('');
+}
+
+// ============ DATA ============
 function initData() {
   data = [];
   for (let g = 0; g < 4; g++) {
     data[g] = [];
     for (let m = 0; m < micePerGroup; m++) {
-      data[g][m] = new Array(totalDays).fill(null);
+      data[g][m] = new Array(timepoints.length).fill(null);
     }
   }
 }
 
-// ============ RANDOM DATA GENERATION ============
 function generateRandom() {
   initData();
   for (let g = 0; g < 4; g++) {
@@ -279,29 +382,29 @@ function generateRandom() {
     const isSham = name.includes('sham');
 
     for (let m = 0; m < micePerGroup; m++) {
-      for (let d = 0; d < totalDays; d++) {
+      for (let ti = 0; ti < timepoints.length; ti++) {
+        const day = timepoints[ti];
         if (isSham) {
-          // Sham: 8-9, slight drop then back
-          const base = (d < 2) ? 7.5 + Math.random() * 0.8 : 8.2 + Math.random() * 0.8;
-          data[g][m][d] = clamp(Math.round(base), 0, 9);
+          const base = (day <= 2) ? 7.5 + Math.random() * 0.8 : 8.2 + Math.random() * 0.8;
+          data[g][m][ti] = clamp(Math.round(base), 0, 9);
         } else {
-          // SCI groups: sigmoid recovery with group-specific plateaus
-          let plateau;
-          let steepness;
-          if (name.includes('treat b'))      { plateau = 6.5; steepness = 0.35; }
-          else if (name.includes('treat a')) { plateau = 5.2; steepness = 0.30; }
-          else                               { plateau = 3.5; steepness = 0.25; }
+          let plateau, steepness, midpoint;
+          if (name.includes('treat b'))      { plateau = 6.8; steepness = 0.30; midpoint = 6; }
+          else if (name.includes('treat a')) { plateau = 5.2; steepness = 0.28; midpoint = 7; }
+          else                               { plateau = 3.5; steepness = 0.25; midpoint = 8; }
 
-          const raw = plateau / (1 + Math.exp(-steepness * (d - 5)));
+          const raw = plateau / (1 + Math.exp(-steepness * (day - midpoint)));
           const noise = (Math.random() - 0.5) * 1.2;
-          const fluctuation = Math.sin(d * 0.6) * 0.3; // slight waviness
-          data[g][m][d] = clamp(Math.round(raw + noise + fluctuation), 0, 9);
+          const fluctuation = Math.sin(day * 0.4) * 0.3;
+          data[g][m][ti] = clamp(Math.round(raw + noise + fluctuation), 0, 9);
         }
       }
-      // Day 1 for SCI: clamp to 0-2
       if (!isSham) {
+        // first timepoint (earliest): clamp to 0-2
         data[g][m][0] = clamp(Math.round(Math.random() * 1.5), 0, 2);
-        data[g][m][1] = clamp(Math.round(0.5 + Math.random() * 1.5), 0, 3);
+        if (timepoints.length > 1 && timepoints[1] <= 5) {
+          data[g][m][1] = clamp(Math.round(0.5 + Math.random() * 2), 0, 3);
+        }
       }
     }
   }
@@ -310,7 +413,7 @@ function generateRandom() {
   toast('已生成随机 BMS 数据');
 }
 
-// ============ RENDER ============
+// ============ RENDER TABLE ============
 function renderAll() {
   const grid = document.getElementById('groupGrid');
   grid.innerHTML = '';
@@ -319,7 +422,6 @@ function renderAll() {
     const card = document.createElement('div');
     card.className = 'group-card';
 
-    // header
     const avgAll = data[g].flat().filter(x => x !== null);
     const avgVal = avgAll.length ? mean(avgAll).toFixed(1) : '-';
 
@@ -335,16 +437,16 @@ function renderAll() {
         <table class="mini-table">
           <thead><tr>
             <th>#</th>
-            ${Array.from({length:totalDays},(_,i)=>`<th>D${i+1}</th>`).join('')}
+            ${timepoints.map(d => `<th>D${d}</th>`).join('')}
           </tr></thead>
           <tbody>
             ${Array.from({length:micePerGroup},(_,m)=>`
               <tr>
                 <td class="mouse-label">M${m+1}</td>
-                ${Array.from({length:totalDays},(_,d)=>`
+                ${timepoints.map((d,ti)=>`
                   <td><input type="number" min="0" max="9" step="1"
-                    value="${data[g][m][d] !== null ? data[g][m][d] : ''}"
-                    data-g="${g}" data-m="${m}" data-d="${d}"
+                    value="${data[g][m][ti] !== null ? data[g][m][ti] : ''}"
+                    data-g="${g}" data-m="${m}" data-ti="${ti}"
                     onchange="onCellChange(this)"
                     onfocus="this.select()">
                   </td>`).join('')}
@@ -364,15 +466,14 @@ function renderAll() {
 function onCellChange(input) {
   const g = parseInt(input.dataset.g);
   const m = parseInt(input.dataset.m);
-  const d = parseInt(input.dataset.d);
+  const ti = parseInt(input.dataset.ti);
   const val = input.value.trim();
   if (val === '' || val === '-') {
-    data[g][m][d] = null;
+    data[g][m][ti] = null;
   } else {
     const num = parseInt(val, 10);
-    if (!isNaN(num)) data[g][m][d] = clamp(num, 0, 9);
+    if (!isNaN(num)) data[g][m][ti] = clamp(num, 0, 9);
   }
-  // refresh group average
   const card = input.closest('.group-card');
   const avgAll = data[g].flat().filter(x => x !== null);
   const avgVal = avgAll.length ? mean(avgAll).toFixed(1) : '-';
@@ -383,13 +484,16 @@ function onCellChange(input) {
 // ============ CHART ============
 function updateChart() {
   const ctx = document.getElementById('bmsChart').getContext('2d');
-  const days = Array.from({length: totalDays}, (_, i) => `D${i+1}`);
+
+  // only use visible timepoints for the chart
+  const visibleIndices = timepoints.map((_, i) => i).filter(i => !hiddenTP.has(i));
+  const labels = visibleIndices.map(i => `D${timepoints[i]}`);
 
   const datasets = groupNames.map((name, g) => {
     const means = [];
     const sems = [];
-    for (let d = 0; d < totalDays; d++) {
-      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+    for (const ti of visibleIndices) {
+      const vals = data[g].map(m => m[ti]).filter(x => x !== null);
       means.push(vals.length ? mean(vals) : null);
       sems.push(vals.length ? sem(vals) : null);
     }
@@ -400,11 +504,11 @@ function updateChart() {
       borderColor: GROUP_COLORS[g],
       backgroundColor: GROUP_COLORS[g] + '18',
       borderWidth: 2.5,
-      pointRadius: 3.5,
+      pointRadius: labels.length > 20 ? 1.5 : 4,
       pointHoverRadius: 6,
       pointBackgroundColor: GROUP_COLORS[g],
       tension: 0.35,
-      fill: true,
+      fill: false,
       spanGaps: false,
     };
   });
@@ -413,7 +517,7 @@ function updateChart() {
 
   chart = new Chart(ctx, {
     type: 'line',
-    data: { labels: days, datasets },
+    data: { labels, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -432,7 +536,8 @@ function updateChart() {
           callbacks: {
             label: function(ctx) {
               const d = ctx.dataIndex;
-              const semVal = ctx.dataset.errorBars[d];
+              const semVal = ctx.dataset.errorBars ? ctx.dataset.errorBars[d] : 0;
+              if (semVal === null || semVal === undefined) return `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}`;
               return `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} ± ${semVal.toFixed(2)}`;
             }
           }
@@ -442,7 +547,7 @@ function updateChart() {
         x: {
           title: { display: true, text: 'Days Post-Injury', font: { family: 'Space Grotesk', size: 12, weight: '600' } },
           grid: { color: '#f0ede8' },
-          ticks: { font: { family: 'DM Mono', size: 10 } }
+          ticks: { font: { family: 'DM Mono', size: 10 }, maxRotation: 45 }
         },
         y: {
           title: { display: true, text: 'BMS Score', font: { family: 'Space Grotesk', size: 12, weight: '600' } },
@@ -457,13 +562,15 @@ function updateChart() {
       afterDraw(chart) {
         const { ctx, scales: { x: xScale, y: yScale } } = chart;
         chart.data.datasets.forEach((ds, i) => {
+          if (!ds.errorBars) return;
           const meta = chart.getDatasetMeta(i);
           ds.data.forEach((val, j) => {
-            if (val === null || ds.errorBars[j] === null) return;
+            if (val === null || ds.errorBars[j] == null) return;
             const pt = meta.data[j];
-            const sem = ds.errorBars[j];
-            const yTop = yScale.getPixelForValue(val + sem);
-            const yBot = yScale.getPixelForValue(val - sem);
+            if (!pt) return;
+            const semVal = ds.errorBars[j];
+            const yTop = yScale.getPixelForValue(val + semVal);
+            const yBot = yScale.getPixelForValue(val - semVal);
             const x = pt.x;
             ctx.save();
             ctx.strokeStyle = ds.borderColor;
@@ -472,7 +579,6 @@ function updateChart() {
             ctx.moveTo(x, yTop);
             ctx.lineTo(x, yBot);
             ctx.stroke();
-            // caps
             ctx.beginPath();
             ctx.moveTo(x - 3, yTop);
             ctx.lineTo(x + 3, yTop);
@@ -486,31 +592,29 @@ function updateChart() {
     }]
   });
 
-  // chart legend inline
   document.getElementById('chartLegend').innerHTML = groupNames.map((n, g) =>
     `<span class="legend-item"><span class="legend-line" style="background:${GROUP_COLORS[g]}"></span>${n}</span>`
   ).join('');
 }
 
-// ============ EXPORT CSV ============
+// ============ CSV EXPORT ============
 function exportCSV() {
-  let csv = '﻿'; // BOM for Excel Chinese support
+  let csv = '﻿'; // BOM
   for (let g = 0; g < 4; g++) {
     csv += `${groupNames[g]}\n`;
-    csv += 'Mouse,' + Array.from({length: totalDays}, (_, i) => `Day${i+1}`).join(',') + '\n';
+    csv += 'Mouse,' + timepoints.map(d => `Day${d}`).join(',') + '\n';
     for (let m = 0; m < micePerGroup; m++) {
-      csv += `M${m+1},` + data[g][m].map(v => v !== null ? v : '').join(',') + '\n';
+      csv += `M${m+1},` + timepoints.map((_, ti) => data[g][m][ti] !== null ? data[g][m][ti] : '').join(',') + '\n';
     }
-    // group averages
     const avgs = [];
-    for (let d = 0; d < totalDays; d++) {
-      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+    for (let ti = 0; ti < timepoints.length; ti++) {
+      const vals = data[g].map(m => m[ti]).filter(x => x !== null);
       avgs.push(vals.length ? mean(vals).toFixed(2) : '');
     }
     csv += 'Mean,' + avgs.join(',') + '\n';
     const sems = [];
-    for (let d = 0; d < totalDays; d++) {
-      const vals = data[g].map(m => m[d]).filter(x => x !== null);
+    for (let ti = 0; ti < timepoints.length; ti++) {
+      const vals = data[g].map(m => m[ti]).filter(x => x !== null);
       sems.push(vals.length ? sem(vals).toFixed(3) : '');
     }
     csv += 'SEM,' + sems.join(',') + '\n\n';
@@ -526,30 +630,27 @@ function exportCSV() {
   toast('CSV 已导出');
 }
 
-// ============ CONFIG ============
-function configDays() {
-  const d = prompt('设置观察天数（1-42）：', totalDays);
-  if (d !== null) {
-    const nd = clamp(parseInt(d, 10) || 14, 1, 42);
-    document.getElementById('totalDays').value = nd;
-    rebuild();
-  }
-}
-
+// ============ REBUILD ============
 function rebuild() {
   micePerGroup = clamp(parseInt(document.getElementById('micePerGroup').value) || 6, 2, 12);
-  totalDays = clamp(parseInt(document.getElementById('totalDays').value) || 14, 1, 42);
+  const raw = document.getElementById('timepointsInput').value.trim();
+  timepoints = parseTimepoints(raw);
+  document.getElementById('timepointsInput').value = timepoints.join(',');
+  // keep hiddenTP but remove indices >= new length
+  for (const idx of hiddenTP) { if (idx >= timepoints.length) hiddenTP.delete(idx); }
   for (let g = 0; g < 4; g++) {
     groupNames[g] = document.getElementById('gname' + g).value.trim() || `Group ${g+1}`;
   }
   initData();
   renderAll();
+  renderChips();
   updateChart();
 }
 
 // ============ INIT ============
 initData();
 renderAll();
+renderChips();
 updateChart();
 </script>
 </body>
